@@ -152,8 +152,7 @@ class RectSprite {
     float _h;
     float _x;
     float _y;
-    float _vx;
-    float _vy;
+    // velocity components moved to Ball
 
   public:
     RectSprite(float w, float h, float x, float y) {
@@ -161,25 +160,17 @@ class RectSprite {
       _h = h;
       _x = x;
       _y = y;
-      _vx = 0.;
-      _vy = 0.;
     }
 
-    void updateXY(float dt) {
-      _x += dt * _vx;
-      _y += dt * _vy;
-    }
-
-    // returns 0 if no impact, 1 if hit
     // pos is y position of hit normalized over self
-    int hit(RectSprite* target, float & pos) {
+    boolean hit(RectSprite* target, float & pos) {
       if (abs(_x - target->_x) >= (_w + target->_w) * 0.5) {
-        return 0;
+        return false;
       } else if (abs(_y - target->_y) >= (_h + target->_h) * 0.5) {
-        return 0;
+        return false;
       }
       pos =  (_y - target->_y) / _h;
-      return 1;
+      return true;
     }
 
     void draw() {
@@ -212,6 +203,8 @@ Bat bat0 = Bat(0);
 Bat bat1 = Bat(1);
 
 class Ball : public RectSprite {
+    float _vx;
+    float _vy;
     byte _hits;
     char _serve_direction;
     float _minY;
@@ -227,6 +220,7 @@ class Ball : public RectSprite {
       char direction = 1;
       _hits = 0;
       _vx = direction * getHSpeed(_hits);
+      _vy = 0.;
       _minY = _h * 0.5;
       _maxY = 1 - _h * 0.5;
       _minX = _w * 0.5;
@@ -269,7 +263,8 @@ class Ball : public RectSprite {
         }
       }
 
-      RectSprite :: updateXY(dt);
+      _x += dt * _vx;
+      _y += dt * _vy;
 
       if (_y > _maxY) {
         _y = clamp(_maxY * 2 - _y, _minY, _maxY);
@@ -284,16 +279,13 @@ class Ball : public RectSprite {
       if (_wait <= 0) {
         if (bats) {
           float y;
-          int impact;
-          impact = bat0.hit(this, y);
-          if (impact) {
+          if (bat0.hit(this, y)) {
             sound(HIT_SOUND_FREQUENCY, HIT_SOUND_DURATION);
             _hits += 1;
             _vx = bat0._direction * getHSpeed(_hits);
             setLoad(getVSpeedLoad(y));
           }
-          impact = bat1.hit(this, y);
-          if (impact) {
+          if (bat1.hit(this, y)) {
             sound(HIT_SOUND_FREQUENCY, HIT_SOUND_DURATION);
             _hits += 1;
             _vx = bat1._direction * getHSpeed(_hits);
