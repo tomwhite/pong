@@ -1,12 +1,13 @@
+
+// Compile for an OLED disply by default. To use TVout, comment out the following line.
+#define OLED 1
+
+#ifdef OLED
+
 #include <Adafruit_SSD1306.h>      // Driver library for 'monochrome' 128x64 and 128x32 OLEDs
 
-#define CONTROLLER_1 1
-#define CONTROLLER_2 2
-#define BUTTON_PIN 5
-#define SOUND_PIN 8
-
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define SCREEN_WIDTH 128 // display width, in pixels
+#define SCREEN_HEIGHT 64 // display height, in pixels
 
 // Declaration for SSD1306 display connected using software SPI (default case):
 #define OLED_MOSI   9
@@ -30,6 +31,36 @@ void updateDisplay() {
   display.display();
   display.clearDisplay();
 }
+
+#else
+
+#include <TVout.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 96 // OLED display height, in pixels
+
+TVout TV;
+
+void initDisplay() {
+  TV.begin(PAL, 128, 96);
+  TV.clear_screen();
+}
+
+void drawRect(byte x0, byte y0, byte w, byte h, char fc) {
+  TV.draw_rect(x0, y0, w - 1, h - 1, fc);
+}
+
+void updateDisplay() {
+  TV.delay_frame(1); // avoid flicker
+  TV.clear_screen();
+}
+
+#endif
+
+#define CONTROLLER_1 1
+#define CONTROLLER_2 2
+#define BUTTON_PIN 5
+#define SOUND_PIN 8
 
 // From pypaddle
 
@@ -101,6 +132,7 @@ const unsigned int BOUNCE_SOUND_FREQUENCY = 246;
 const unsigned long BOUNCE_SOUND_DURATION = 16;
 const float JOY_RANGE = 0.7;
 
+// sounds are not implemented for TVout (needs work to find more RAM)
 const boolean SILENT = true;
 
 const byte WINDOW_SIZE[] = { SCREEN_WIDTH, SCREEN_HEIGHT };
