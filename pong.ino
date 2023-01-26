@@ -17,6 +17,20 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
                          OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
 
+void initDisplay() {
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
+  display.clearDisplay();
+}
+
+void drawRect(byte x0, byte y0, byte w, byte h, char fc) {
+  display.drawRect(x0, y0, w, h, fc);
+}
+
+void updateDisplay() {
+  display.display();
+  display.clearDisplay();
+}
+
 // From pypaddle
 
 const float SERVE_DELAY = 1.5;
@@ -48,6 +62,7 @@ const float DIGIT_PIXEL_V = 4 * V;
 const float DIGIT_PIXEL_H = 4 * H;
 /*
    DIGITS in original is represented as bit masks rather than strings to save space.
+   We also store in program memory, rather than RAM.
 
    The segments are labelled as follows:
 
@@ -74,8 +89,8 @@ const float DIGIT_PIXEL_H = 4 * H;
    8     ABCDEFG 0111 1111   7F
    9     ABCDFG  0110 1111   6F
 */
-const byte SEGMENTS[][4] = {{0, 0, 3, 0}, {3, 0, 3, 3}, {3, 3, 3, 7}, {0, 7, 3, 7}, {0, 3, 0, 7}, {0, 0, 0, 3}, {0, 3, 3, 3}};
-const byte DIGITS[10] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+const byte SEGMENTS[][4] PROGMEM = {{0, 0, 3, 0}, {3, 0, 3, 3}, {3, 3, 3, 7}, {0, 7, 3, 7}, {0, 3, 0, 7}, {0, 0, 0, 3}, {0, 3, 3, 3}};
+const byte DIGITS[10] PROGMEM = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 // sounds are separated into two variables (original uses tuples)
 const unsigned int HIT_SOUND_FREQUENCY = 491;
@@ -177,7 +192,7 @@ class RectSprite {
       int sx, sy, sw, sh;
       toScreenXY(_x, _y, sx, sy);
       toScreenWH(_w, _h, sw, sh);
-      display.drawRect(sx, sy, sw, sh, WHITE);
+      drawRect(sx, sy, sw, sh, WHITE);
     }
 };
 
@@ -323,14 +338,14 @@ void drawDigit(float x, float y, int n) {
   toScreenXY(x, y, x_, y_);
   int w, h;
   toScreenWH(DIGIT_PIXEL_H, DIGIT_PIXEL_V, w, h);
-  byte d = DIGITS[n];
+  byte d = pgm_read_byte(&(DIGITS[n]));
   for (int i = 0; i <= 7; i++) {
     if (bitRead(d, i)) {
-      int sw = (SEGMENTS[i][2] - SEGMENTS[i][0] + 1) * w;
-      int sh = (SEGMENTS[i][3] - SEGMENTS[i][1] + 1) * h;
-      int sx = x_ + SEGMENTS[i][0] * w;
-      int sy = y_ + SEGMENTS[i][1] * h;
-      display.drawRect(sx, sy, sw, sh, WHITE);
+      int sw = (pgm_read_byte(&(SEGMENTS[i][2])) - pgm_read_byte(&(SEGMENTS[i][0])) + 1) * w;
+      int sh = (pgm_read_byte(&(SEGMENTS[i][3])) - pgm_read_byte(&(SEGMENTS[i][1])) + 1) * h;
+      int sx = x_ + pgm_read_byte(&(SEGMENTS[i][0])) * w;
+      int sy = y_ + pgm_read_byte(&(SEGMENTS[i][1])) * h;
+      drawRect(sx, sy, sw, sh, WHITE);
     }
   }
 }
@@ -379,7 +394,7 @@ void net() {
   int sx, sy;
   while (y < 1.) {
     toScreenXY(NET_X_START, y, sx, sy);
-    display.drawRect(sx, sy, w, h, WHITE);
+    drawRect(sx, sy, w, h, WHITE);
     y += 2 * NET_STRIPE_HEIGHT;
   }
 }
@@ -401,9 +416,8 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   Serial.begin(9600);
-  Serial.println("PONG");
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 128x64)
-  display.clearDisplay();
+
+  initDisplay();
 
   prev = millis();
 }
@@ -435,8 +449,7 @@ void loop() {
       attract();
     }
   }
-  display.display();
-  display.clearDisplay();
+  updateDisplay();
 
   prev = now;
 }
