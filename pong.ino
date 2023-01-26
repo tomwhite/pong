@@ -19,33 +19,33 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
 
 // From pypaddle
 
-float SERVE_DELAY = 1.5;
-int HEIGHT = 3;
-float V = 1./(262-16);
-int WIDTH = 4;
-float H = 1./(455-80);
-float BAT_HEIGHT = 16*V;
-float BAT_WIDTH = 4*H;
-float BALL_HEIGHT = 4*V;
-float BALL_WIDTH = 4*H;
-float NET_WIDTH = H;
+const float SERVE_DELAY = 1.5;
+const byte HEIGHT = 3;
+const float V = 1./(262-16);
+const byte WIDTH = 4;
+const float H = 1./(455-80);
+const float BAT_HEIGHT = 16*V;
+const float BAT_WIDTH = 4*H;
+const float BALL_HEIGHT = 4*V;
+const float BALL_WIDTH = 4*H;
+const float NET_WIDTH = H;
 // HSPEEDS in original is represented as two arrays here (HHITS and HSPEEDS)
-int HHITS[] = { 0,4,12 };
-float HSPEEDS[] = { 0.26,0.39,0.53 };
-int VLOADS[] = { 0,1,2,3,3,4,5,6 };
-float VSPEEDS[] = { 0.680,0.455,0.228,0,-0.226,-0.462,-0.695 };
-float TOP_GAP = 6*V;
-float BOTTOM_GAP = 4*V;
-float BAT_1_X_START = 48*H;
-float NET_X_START = 176*H;
-float NET_STRIPE_HEIGHT = 4*V;
-float BAT_2_X_START = 304*H;
-float BALL_X_START = NET_X_START + 6*H;
-float SCORE_1_X_START = 48*H;
-float SCORE_2_X_START = 192*H;
-float SCORE_Y_START = 16*V;
-float DIGIT_PIXEL_V = 4*V;
-float DIGIT_PIXEL_H = 4*H;
+const byte HHITS[] = { 0,4,12 };
+const float HSPEEDS[] = { 0.26,0.39,0.53 };
+const byte VLOADS[] = { 0,1,2,3,3,4,5,6 };
+const float VSPEEDS[] = { 0.680,0.455,0.228,0,-0.226,-0.462,-0.695 };
+const float TOP_GAP = 6*V;
+const float BOTTOM_GAP = 4*V;
+const float BAT_1_X_START = 48*H;
+const float NET_X_START = 176*H;
+const float NET_STRIPE_HEIGHT = 4*V;
+const float BAT_2_X_START = 304*H;
+const float BALL_X_START = NET_X_START + 6*H;
+const float SCORE_1_X_START = 48*H;
+const float SCORE_2_X_START = 192*H;
+const float SCORE_Y_START = 16*V;
+const float DIGIT_PIXEL_V = 4*V;
+const float DIGIT_PIXEL_H = 4*H;
 /*
  * DIGITS in original is represented as bit masks rather than strings to save space.
  * 
@@ -74,23 +74,23 @@ float DIGIT_PIXEL_H = 4*H;
  * 8     ABCDEFG 0111 1111   7F
  * 9     ABCDFG  0110 1111   6F
  */
-int SEGMENTS[][4] = {{0,0,3,0},{3,0,3,3},{3,3,3,7},{0,7,3,7},{0,3,0,7},{0,0,0,3},{0,3,3,3}};
-byte DIGITS[10] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+const byte SEGMENTS[][4] = {{0,0,3,0},{3,0,3,3},{3,3,3,7},{0,7,3,7},{0,3,0,7},{0,0,0,3},{0,3,3,3}};
+const byte DIGITS[10] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 // sounds are separated into two variables (original uses tuples)
-unsigned int HIT_SOUND_FREQUENCY = 491;
-unsigned long HIT_SOUND_DURATION = 16;
-unsigned int SCORE_SOUND_FREQUENCY = 246;
-unsigned long SCORE_SOUND_DURATION = 220;
-unsigned int BOUNCE_SOUND_FREQUENCY = 246;
-unsigned long BOUNCE_SOUND_DURATION = 16;
-float JOY_RANGE = 0.7;
+const unsigned int HIT_SOUND_FREQUENCY = 491;
+const unsigned long HIT_SOUND_DURATION = 16;
+const unsigned int SCORE_SOUND_FREQUENCY = 246;
+const unsigned long SCORE_SOUND_DURATION = 220;
+const unsigned int BOUNCE_SOUND_FREQUENCY = 246;
+const unsigned long BOUNCE_SOUND_DURATION = 16;
+const float JOY_RANGE = 0.7;
 
-int SILENT = 1;
+const boolean SILENT = true;
 
-int WINDOW_SIZE[] = { SCREEN_WIDTH, SCREEN_HEIGHT };
-float SCALE[] = { float(WINDOW_SIZE[1]) * WIDTH / HEIGHT, float(WINDOW_SIZE[1]) };
-int CENTER[]= { WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2 };
+const byte WINDOW_SIZE[] = { SCREEN_WIDTH, SCREEN_HEIGHT };
+const float SCALE[] = { float(WINDOW_SIZE[1]) * WIDTH / HEIGHT, float(WINDOW_SIZE[1]) };
+const byte CENTER[]= { WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2 };
 
 float clamp(float x, float m, float M) {
     return max(min(x,M),m);
@@ -192,11 +192,11 @@ class RectSprite {
 
 class Bat : public RectSprite {
   public:
-  int _index;
-  int _direction;
+  byte _index;
+  char _direction;
 
   public:
-  Bat(int index) : RectSprite(BAT_WIDTH, BAT_HEIGHT, 0.5, 0.5) {
+  Bat(byte index) : RectSprite(BAT_WIDTH, BAT_HEIGHT, 0.5, 0.5) {
     _index = index;
     _direction = (index == 0 ? 1 : -1);
     _x = (index == 0 ? BAT_1_X_START : BAT_2_X_START) + _w*0.5;
@@ -207,24 +207,24 @@ class Bat : public RectSprite {
   }
 };
 
-int bats = 0; // whether bats are active or not
+boolean bats = false; // whether bats are active or not
 Bat bat0 = Bat(0);
 Bat bat1 = Bat(1);
 
 class Ball : public RectSprite {
-  int _hits;
-  int _serve_direction;
+  byte _hits;
+  char _serve_direction;
   float _minY;
   float _maxY;
   float _minX;
   float _maxX;
   float _wait;
-  int _load;
+  byte _load;
  
   public:
   Ball() : RectSprite(BALL_WIDTH, BALL_HEIGHT, 0.4, 0.) {
-    int load = 0;
-    int direction = 1;
+    byte load = 0;
+    char direction = 1;
     _hits = 0;
     _vx = direction*getHSpeed(_hits);
     _minY = _h*0.5;
@@ -355,7 +355,7 @@ void drawScore(float x, float y, int score) {
   }
 }
 
-int scores[2] = {0,0};
+byte scores[2] = {0,0};
 Ball ball = Ball();
 
 float get_axis(int index) {
@@ -369,12 +369,12 @@ float adjustJoystick(float y) {
 }
 
 void attract() {
-  bats = 0;
+  bats = false;
   ball.setLoad(0);
 }
 
 void start() {
-  bats = 1;
+  bats = true;
   scores[0] = 0;
   scores[1] = 0;
   ball.serve();
