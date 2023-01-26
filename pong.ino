@@ -6,8 +6,8 @@
 
 #include <Adafruit_SSD1306.h>      // Driver library for 'monochrome' 128x64 and 128x32 OLEDs
 
-#define SCREEN_WIDTH 128 // display width, in pixels
-#define SCREEN_HEIGHT 64 // display height, in pixels
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
 // Declaration for SSD1306 display connected using software SPI (default case):
 #define OLED_MOSI   9
@@ -36,8 +36,8 @@ void updateDisplay() {
 
 #include <TVout.h>
 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 96 // OLED display height, in pixels
+#define SCREEN_WIDTH 128 // TV display width, in pixels
+#define SCREEN_HEIGHT 96 // TV display height, in pixels
 
 TVout TV;
 
@@ -432,7 +432,6 @@ void net() {
 }
 
 void drawBoard() {
-  //    display.clearDisplay();
   net();
 }
 
