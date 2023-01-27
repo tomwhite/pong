@@ -2,6 +2,11 @@
 // Compile for an OLED disply by default. To use TVout, comment out the following line.
 #define OLED 1
 
+#define CONTROLLER_1 1
+#define CONTROLLER_2 2
+#define BUTTON_PIN 5
+#define SOUND_PIN 8
+
 #ifdef OLED
 
 #include <Adafruit_SSD1306.h>      // Driver library for 'monochrome' 128x64 and 128x32 OLEDs
@@ -32,6 +37,10 @@ void updateDisplay() {
   display.clearDisplay();
 }
 
+void playSound(unsigned int frequency, unsigned long duration) {
+  tone(SOUND_PIN, frequency, duration);
+}
+
 #else
 
 #include <TVout.h>
@@ -55,12 +64,12 @@ void updateDisplay() {
   TV.clear_screen();
 }
 
-#endif
+void playSound(unsigned int frequency, unsigned long duration) {
+  TV.tone(frequency, duration);
+}
 
-#define CONTROLLER_1 1
-#define CONTROLLER_2 2
-#define BUTTON_PIN 5
-#define SOUND_PIN 8
+
+#endif
 
 // From pypaddle
 
@@ -132,7 +141,6 @@ const unsigned int BOUNCE_SOUND_FREQUENCY = 246;
 const unsigned long BOUNCE_SOUND_DURATION = 16;
 const float JOY_RANGE = 0.7;
 
-// sounds are not implemented for TVout (needs work to find more RAM)
 const boolean SILENT = true;
 
 const byte WINDOW_SIZE[] = { SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -437,7 +445,7 @@ void drawBoard() {
 
 void sound(unsigned int frequency, unsigned long duration) {
   if (not SILENT) {
-    tone(SOUND_PIN, frequency, duration);
+    playSound(frequency, duration);
   }
 }
 
