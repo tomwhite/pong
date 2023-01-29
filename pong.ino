@@ -1,6 +1,17 @@
+/*
+
+  An Arduino port of pypaddle, which is "a paddle ball bouncing game very similar to Pong".
+
+  See https://github.com/arpruss/pypaddle
+
+  This version can use an OLED display, or a TV via the TVout library.
+
+  Further details, including wiring, at https://github.com/tomwhite/pong.
+
+*/
 
 // Compile for an OLED disply by default. To use TVout, comment out the following line.
-#define OLED 1
+//#define OLED 1
 
 #define CONTROLLER_1 1
 #define CONTROLLER_2 2
@@ -71,7 +82,7 @@ void playSound(unsigned int frequency, unsigned long duration) {
 
 #endif
 
-// From pypaddle
+// Code from here onwards follows the naming and structure of pypaddle as far as possible
 
 const float SERVE_DELAY = 1.5;
 const byte HEIGHT = 3;
@@ -101,7 +112,7 @@ const float SCORE_Y_START = 16 * V;
 const float DIGIT_PIXEL_V = 4 * V;
 const float DIGIT_PIXEL_H = 4 * H;
 /*
-   DIGITS in original is represented as bit masks rather than strings to save space.
+   DIGITS in pypaddle is represented as bit masks rather than strings to save space.
    We also store in program memory, rather than RAM.
 
    The segments are labelled as follows:
@@ -132,7 +143,7 @@ const float DIGIT_PIXEL_H = 4 * H;
 const byte SEGMENTS[][4] PROGMEM = {{0, 0, 3, 0}, {3, 0, 3, 3}, {3, 3, 3, 7}, {0, 7, 3, 7}, {0, 3, 0, 7}, {0, 0, 0, 3}, {0, 3, 3, 3}};
 const byte DIGITS[10] PROGMEM = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
-// sounds are separated into two variables (original uses tuples)
+// sounds are separated into two variables (pypaddle uses tuples)
 const unsigned int HIT_SOUND_FREQUENCY = 491;
 const unsigned long HIT_SOUND_DURATION = 16;
 const unsigned int SCORE_SOUND_FREQUENCY = 246;
@@ -151,7 +162,6 @@ float clamp(float x, float m, float M) {
   return max(min(x, M), m);
 }
 
-// hits is passed in here (unlike original which may have a bug?)
 float getHSpeed(int hits) {
   int len = sizeof(HHITS) / sizeof(HHITS[0]);
   float prev = 0;
@@ -185,8 +195,6 @@ int sign(float x) {
     return 0;
   }
 }
-
-// TODO: getScale for dynamic window sizing
 
 // https://forum.arduino.cc/t/returning-two-values-from-a-function/90068/13
 void toScreenXY(float x, float y, int & sx, int & sy) {
@@ -492,5 +500,3 @@ void loop() {
 
   prev = now;
 }
-
-// End from pypaddle
