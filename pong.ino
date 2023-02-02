@@ -11,7 +11,7 @@
 */
 
 // Compile for an OLED disply by default. To use TVout, comment out the following line.
-//#define OLED 1
+#define OLED 1
 
 #define CONTROLLER_1 1
 #define CONTROLLER_2 2
